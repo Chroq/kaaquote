@@ -5,7 +5,7 @@ extern crate rocket;
 extern crate quoter;
 
 use rocket::request::Form;
-use quoter::crawler;
+use regex::Regex;
 
 #[derive(FromForm)]
 struct Input {
@@ -14,21 +14,24 @@ struct Input {
 
 #[post("/", data = "<input>")]
 fn index(input: Form<Input>) -> String {
+    let vec: Vec<String> = vec![
+        "Bon, je vais essayer de trouver un petit lièvre pour ce soir parce qu’il commence à faire faim&nbsp;!".to_string(),
+        "Pour attraper des bêtes, il faut imiter les femelles. Là, pour le coup, hop&nbsp;! La femelle lièvre.".to_string(),
+        "Je me demande comment vous faîtes, moi je serais incapable de trouver de quoi manger dans la forêt.".to_string()
+    ];
 
-    let word: String = input.into_inner().text;
+    let pattern: String = input.into_inner().text;
+    let re = Regex::new(&pattern).unwrap();
 
-//    quoter::searcher::search(word);
+    let found: Vec<String> = vec
+        .into_iter()
+        .filter(|x| x.contains(&pattern))
+        .collect();
 
-    format!("{} !", word)
+    format!("{}", found.first())
 }
 
 fn main() {
-
-    // @todo: Change this to something more parametrable. Env variable ?
-    let uri = "https://fr.wikiquote.org/wiki/Kaamelott".parse().unwrap();
-
-    crawler::generate(uri);
-
     rocket::ignite()
         .mount("/", routes![index])
         .launch();
