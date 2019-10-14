@@ -3,9 +3,11 @@
 #[macro_use]
 extern crate rocket;
 extern crate quoter;
+extern crate rand;
 
 use rocket::request::Form;
-use regex::Regex;
+
+use rand::Rng;
 
 #[derive(FromForm)]
 struct Input {
@@ -14,21 +16,26 @@ struct Input {
 
 #[post("/", data = "<input>")]
 fn index(input: Form<Input>) -> String {
-    let vec: Vec<String> = vec![
-        "Bon, je vais essayer de trouver un petit lièvre pour ce soir parce qu’il commence à faire faim&nbsp;!".to_string(),
-        "Pour attraper des bêtes, il faut imiter les femelles. Là, pour le coup, hop&nbsp;! La femelle lièvre.".to_string(),
-        "Je me demande comment vous faîtes, moi je serais incapable de trouver de quoi manger dans la forêt.".to_string()
+    let mut vec: Vec<String> = vec![
+        String::from("Pour attraper des bêtes, il faut imiter les femelles. Là, pour le coup, hop&nbsp;! La femelle lièvre."),
+        String::from("Bon, je vais essayer de trouver un petit lièvre pour ce soir parce qu’il commence à faire faim&nbsp;!"),
+        String::from("Je me demande comment vous faîtes, moi je serais incapable de trouver de quoi manger dans la forêt.")
     ];
 
     let pattern: String = input.into_inner().text;
-    let re = Regex::new(&pattern).unwrap();
+    vec.retain(|x| { x.contains(&pattern) });
 
-    let found: Vec<String> = vec
-        .into_iter()
-        .filter(|x| x.contains(&pattern))
-        .collect();
+    let mut rng = rand::thread_rng();
 
-    format!("{}", found.first())
+    let entry_count: usize = vec.len();
+
+    let found: String = match entry_count == 0 {
+        false => vec.get(rng.gen_range(0,entry_count)).unwrap().to_string(),
+        true => String::from("Aucune citation trouvée"),
+    };
+
+    format!("{:?}", found)
+
 }
 
 fn main() {
