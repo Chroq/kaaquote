@@ -12,6 +12,7 @@ rand = "0.7.2"
 serde = "*"
 serde_json = "*"
 serde_derive = "*"
+hyper = "0.12"
 
 [dependencies.rocket_contrib]
 version = "*"

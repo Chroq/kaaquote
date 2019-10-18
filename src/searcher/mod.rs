@@ -1,4 +1,5 @@
 mod extractor;
+pub mod scrapper;
 
 extern crate rand;
 extern crate serde;
@@ -29,11 +30,10 @@ pub fn search(word: String) -> String {
 
     let entry_count: usize = quotes.len();
 
-    let found: String = match entry_count == 0 {
+    match entry_count == 0 {
         false => quotes.get(rng.gen_range(0, entry_count)).unwrap().format(),
         true => String::from("Aucune citation trouvée"),
-    };
-    found
+    }
 }
 
 
