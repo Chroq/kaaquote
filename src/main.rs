@@ -14,11 +14,11 @@ struct Input {
 
 #[post("/", data = "<input>")]
 fn index(input: Form<Input>) -> String {
-    searcher::search(input.into_inner().text)
+    searcher::search(input.into_inner().text, searcher::get())
 }
 
 fn main() {
-    println!("{}", searcher::scrapper::write_json_quotes());
+    searcher::init();
 
     rocket::ignite()
         .mount("/", routes![index])
