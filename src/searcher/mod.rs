@@ -1,40 +1,66 @@
 mod extractor;
+pub mod scraper;
 
 extern crate rand;
 extern crate serde;
 extern crate serde_derive;
 
+use std::path::Path;
 use serde_derive::{Deserialize, Serialize};
-
 use rand::Rng;
 
-#[derive(Serialize, Deserialize, Debug)]
+/// Const PATH : Used to declare the path of file writing
+const PATH: &str = "data/kaa.json";
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Quote {
     text: String,
-    character: String,
 }
 
 impl Quote {
+    /// Format a quote struct
     fn format(&self) -> String {
-        format!("{} - {}", self.text, self.character)
+        format!("{}", self.text)
     }
+
 }
 
-pub fn search(word: String) -> String {
-    let mut quotes: Vec<Quote> = extractor::read_quote_from_file("/home/chris/Apps/www/kaaquote/data/sample.json").unwrap();
+///
+///
+///
+pub fn init() -> Vec<Quote> {
+    if !Path::new(PATH).exists() {
+        println!("Récupération des citations");
+        let quotes = scraper::get_quotes();
 
-    quotes.retain(|x| { x.text.contains(&word) });
+        println!("Écriture local du fichier");
+        extractor::write_quote_into_file(quotes);
+    }
+
+    extractor::read_quote_from_file(PATH).unwrap()
+}
+
+///
+///
+///
+pub fn search(word: String, slice: &[Quote]) -> String {
+
+    let mut founds= vec![];
+
+    for quote in slice.iter() {
+        if quote.text.contains(&word) {
+            founds.push(quote)
+        }
+    }
 
     let mut rng = rand::thread_rng();
 
-    let entry_count: usize = quotes.len();
+    let entry_count: usize = founds.len();
 
-    let found: String = match entry_count == 0 {
-        false => quotes.get(rng.gen_range(0, entry_count)).unwrap().format(),
+    match entry_count == 0 {
+        false => founds.get(rng.gen_range(0, entry_count)).unwrap().format(),
         true => String::from("Aucune citation trouvée"),
-    };
-    found
+    }
+
+//    "OK".to_string()
 }
-
-
-
