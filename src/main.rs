@@ -6,6 +6,8 @@ extern crate rocket;
 mod searcher;
 
 use rocket::request::Form;
+use rocket::State;
+use crate::searcher::Quote;
 
 #[derive(FromForm)]
 struct Input {
@@ -13,14 +15,16 @@ struct Input {
 }
 
 #[post("/", data = "<input>")]
-fn index(input: Form<Input>) -> String {
-    searcher::search(input.into_inner().text, searcher::get())
+fn index(input: Form<Input>, quotes: State<Vec<Quote>>) -> String {
+
+    searcher::search(input.into_inner().text, &quotes)
 }
 
 fn main() {
-    searcher::init();
+    let quotes = searcher::init();
 
     rocket::ignite()
+        .manage(quotes)
         .mount("/", routes![index])
         .launch();
 }

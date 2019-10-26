@@ -12,32 +12,23 @@ use rand::Rng;
 /// Const PATH : Used to declare the path of file writing
 const PATH: &str = "data/kaa.json";
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Quote {
     text: String,
 }
 
 impl Quote {
-    /// Format a quote
-    ///
-    ///
+    /// Format a quote struct
     fn format(&self) -> String {
         format!("{}", self.text)
     }
-}
 
-
-///
-///
-/// @todo: Put this in memory !
-pub fn get() -> Vec<Quote> {
-    extractor::read_quote_from_file(PATH).unwrap()
 }
 
 ///
 ///
 ///
-pub fn init() -> () {
+pub fn init() -> Vec<Quote> {
     if !Path::new(PATH).exists() {
         println!("Récupération des citations");
         let quotes = scraper::get_quotes();
@@ -45,20 +36,31 @@ pub fn init() -> () {
         println!("Écriture local du fichier");
         extractor::write_quote_into_file(quotes);
     }
+
+    extractor::read_quote_from_file(PATH).unwrap()
 }
 
 ///
 ///
 ///
-pub fn search(word: String, mut quotes: Vec<Quote>) -> String {
-    quotes.retain(|x| { x.text.contains(&word) });
+pub fn search(word: String, slice: &[Quote]) -> String {
+
+    let mut founds= vec![];
+
+    for quote in slice.iter() {
+        if quote.text.contains(&word) {
+            founds.push(quote)
+        }
+    }
 
     let mut rng = rand::thread_rng();
 
-    let entry_count: usize = quotes.len();
+    let entry_count: usize = founds.len();
 
     match entry_count == 0 {
-        false => quotes.get(rng.gen_range(0, entry_count)).unwrap().format(),
+        false => founds.get(rng.gen_range(0, entry_count)).unwrap().format(),
         true => String::from("Aucune citation trouvée"),
     }
+
+//    "OK".to_string()
 }
