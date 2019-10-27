@@ -13,6 +13,10 @@ start: ## Start project
 	@echo "Start the project"
 	cargo run
 
+serve! ## Build for production and serve
+	@echo "Start the project (production mode)"
+	cargo run --release 
+
 test: ## Launch the project's tests
 	@echo "Launch the tests"
 	cargo test
