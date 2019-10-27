@@ -5,12 +5,14 @@ extern crate rand;
 extern crate serde;
 extern crate serde_derive;
 
+use std::fs;
 use std::path::Path;
 use serde_derive::{Deserialize, Serialize};
 use rand::Rng;
 
 /// Const PATH : Used to declare the path of file writing
-const PATH: &str = "data/kaa.json";
+const DATA_DIRECTORY: &str = "data";
+const FILE: &str = "kaa.json";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Quote {
@@ -22,30 +24,31 @@ impl Quote {
     fn format(&self) -> String {
         format!("{}", self.text)
     }
-
 }
 
 ///
 ///
 ///
 pub fn init() -> Vec<Quote> {
-    if !Path::new(PATH).exists() {
-        println!("Récupération des citations");
+    let file_path = format!("{}/{}", DATA_DIRECTORY, FILE );
+    if !Path::new(file_path.as_str()).exists() {
         let quotes = scraper::get_quotes();
 
-        println!("Écriture local du fichier");
-        extractor::write_quote_into_file(quotes);
+        match fs::create_dir(DATA_DIRECTORY) {
+            Ok(_t) => {}
+            Err(_e) => {}
+        };
+        extractor::write_quote_into_file(quotes, &file_path);
     }
 
-    extractor::read_quote_from_file(PATH).unwrap()
+    extractor::read_quote_from_file(file_path).unwrap()
 }
 
 ///
 ///
 ///
 pub fn search(word: String, slice: &[Quote]) -> String {
-
-    let mut founds= vec![];
+    let mut founds = vec![];
 
     for quote in slice.iter() {
         if quote.text.contains(&word) {
@@ -61,6 +64,4 @@ pub fn search(word: String, slice: &[Quote]) -> String {
         false => founds.get(rng.gen_range(0, entry_count)).unwrap().format(),
         true => String::from("Aucune citation trouvée"),
     }
-
-//    "OK".to_string()
 }

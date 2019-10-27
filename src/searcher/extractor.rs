@@ -21,13 +21,12 @@ pub fn read_quote_from_file<P: AsRef<Path>>(path: P) -> Result<Vec<Quote>, Box<d
 /// Write quote into a file
 ///
 /// Based on the path configured, all quotes are serialized and written on a json file.
-pub fn write_quote_into_file(quotes: Vec<Quote>) -> () {
-
-    let mut output = File::create( crate::searcher::PATH).unwrap();
+pub fn write_quote_into_file(quotes: Vec<Quote>, path: &String) -> () {
+    let mut output = File::create(path).unwrap();
     let json = serde_json::to_string(&quotes).unwrap();
 
     match write!(output, "{}", json.as_str()) {
-        Ok(_t) => println!("File has been writen."),
+        Ok(_t) => println!("File has been written."),
         Err(e) => println!("File can't be write. {}", e)
     };
 }
