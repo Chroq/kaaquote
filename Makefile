@@ -9,13 +9,13 @@ install: ## Install project's dependencies
 	@echo "Install project deps"
 	cargo build
 
-start: ## Start project
+start:
 	@echo "Start the project"
 	cargo run
 
-serve! ## Build for production and serve
+release:
 	@echo "Start the project (production mode)"
-	cargo run --release 
+	cargo run --release
 
 test: ## Launch the project's tests
 	@echo "Launch the tests"
