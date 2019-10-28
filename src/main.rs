@@ -10,13 +10,24 @@ use rocket::State;
 use crate::searcher::Quote;
 
 #[derive(FromForm)]
-struct Input {
-    text: String
+struct Command {
+    text: String,
+    token: String,
+    team_id: String,
+    team_domain: String,
+    enterprise_id: String,
+    enterprise_name: String,
+    channel_id: String,
+    channel_name: String,
+    user_id: String,
+    user_name: String,
+    command: String,
+    response_url: String,
+    trigger_id: String,
 }
 
 #[post("/", data = "<input>")]
-fn index(input: Form<Input>, quotes: State<Vec<Quote>>) -> String {
-
+fn index(input: Form<Command>, quotes: State<Vec<Quote>>) -> String {
     searcher::search(input.into_inner().text, &quotes)
 }
 
