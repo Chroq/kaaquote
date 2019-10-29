@@ -20,3 +20,7 @@ release: ## Build for production and serve
 test: ## Launch the project's tests
 	@echo "Launch the tests"
 	cargo test
+
+debug: ## Launch the project's tests with debug
+	@echo "Launch the tests as debug"
+	export RUST_BACKTRACE=1 && cargo test -- --nocapture

@@ -17,12 +17,18 @@ const FILE: &str = "kaa.json";
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Quote {
     text: String,
+    character: String,
 }
 
 impl Quote {
     /// Format a quote struct
     fn format(&self) -> String {
-        format!("{}", self.text)
+        format!("{} - <i>{}</i>", self.text, self.character)
+    }
+
+    /// Search into text the patter
+    fn search_for_word(&self, word: &str) -> bool {
+        self.text.contains(&word)
     }
 
     /// Search into text the patter
