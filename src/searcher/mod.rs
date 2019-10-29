@@ -24,13 +24,18 @@ impl Quote {
     fn format(&self) -> String {
         format!("{}", self.text)
     }
+
+    /// Search into text the patter
+    fn search_for_word(&self, word: &str) -> bool {
+        self.text.contains(&word)
+    }
 }
 
 ///
 ///
 ///
 pub fn init() -> Vec<Quote> {
-    let file_path = format!("{}/{}", DATA_DIRECTORY, FILE );
+    let file_path = format!("{}/{}", DATA_DIRECTORY, FILE);
     if !Path::new(file_path.as_str()).exists() {
         let quotes = scraper::get_quotes();
 
@@ -47,21 +52,17 @@ pub fn init() -> Vec<Quote> {
 ///
 ///
 ///
-pub fn search(word: String, slice: &[Quote]) -> String {
-    let mut founds = vec![];
+pub fn search(word: String, mut slice: &[Quote]) -> String {
+    let mut founds = slice.to_vec();
+    founds.retain(|x| x.search_for_word(&word));
 
-    for quote in slice.iter() {
-        if quote.text.contains(&word) {
-            founds.push(quote)
+    let entry_count = founds.len();
+    
+    match entry_count {
+        0 => String::from("Aucune citation trouvée"),
+        _ => {
+            let position = rand::thread_rng().gen_range(0, entry_count);
+            founds.get(position).unwrap().format()
         }
-    }
-
-    let mut rng = rand::thread_rng();
-
-    let entry_count: usize = founds.len();
-
-    match entry_count == 0 {
-        false => founds.get(rng.gen_range(0, entry_count)).unwrap().format(),
-        true => String::from("Aucune citation trouvée"),
     }
 }

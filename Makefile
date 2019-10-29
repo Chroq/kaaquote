@@ -13,7 +13,7 @@ start:
 	@echo "Start the project"
 	cargo run
 
-release:
+release: ## Build for production and serve
 	@echo "Start the project (production mode)"
 	cargo run --release
 
