@@ -13,10 +13,14 @@ start:
 	@echo "Start the project"
 	cargo run
 
-release:
+release: ## Build for production and serve
 	@echo "Start the project (production mode)"
 	cargo run --release
 
 test: ## Launch the project's tests
 	@echo "Launch the tests"
 	cargo test
+
+debug: ## Launch the project's tests with debug
+	@echo "Launch the tests as debug"
+	export RUST_BACKTRACE=1 && cargo test -- --nocapture
