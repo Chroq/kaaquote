@@ -26,12 +26,7 @@ impl Quote {
         format!("{} - <i>{}</i>", self.text, self.character)
     }
 
-    /// Search into text the patter
-    fn search_for_word(&self, word: &str) -> bool {
-        self.text.contains(&word)
-    }
-
-    /// Search into text the patter
+    /// Search into text the pattern
     fn search_for_word(&self, word: &str) -> bool {
         self.text.contains(&word)
     }
