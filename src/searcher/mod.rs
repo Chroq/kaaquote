@@ -21,6 +21,15 @@ pub struct Quote {
 }
 
 impl Quote {
+
+    /// create a quote based on & str
+    fn new(text: &str, character: &str) -> Quote {
+        Quote {
+            text: text.to_string(),
+            character: character.to_string(),
+        }
+    }
+
     /// Format a quote struct
     fn format(&self) -> String {
         format!("{} - <i>{}</i>", self.text, self.character)
@@ -53,12 +62,12 @@ pub fn init() -> Vec<Quote> {
 ///
 ///
 ///
-pub fn search(word: String, mut slice: &[Quote]) -> String {
+pub fn search(word: String, slice: &[Quote]) -> String {
     let mut founds = slice.to_vec();
     founds.retain(|x| x.search_for_word(&word));
 
     let entry_count = founds.len();
-    
+
     match entry_count {
         0 => String::from("Aucune citation trouvée"),
         _ => {
