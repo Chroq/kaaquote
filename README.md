@@ -32,8 +32,6 @@ Please make sure to update tests as appropriate.
 make test
 ```
 
-To learn more about the contributions to this project, consult the [contribution guide](/.github/CONTRIBUTING.md).
-
 ## License
 
-foss-starter-kit is licensed under the [MIT License](LICENSE).
+kaaquote is licensed under the [MIT License](LICENSE).

@@ -23,6 +23,7 @@ test: ## Launch the project's tests
 
 debug: ## Launch the project's tests with debug
 	@echo "Launch the tests as debug"
+	rm -f data/kaa.json
 	export RUST_BACKTRACE=1 && \
 	    cargo test -- --nocapture && \
 	    make start
