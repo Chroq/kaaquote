@@ -11,51 +11,52 @@ static SOURCE: &str = "https://fr.wikiquote.org";
 
 /// Url of the page to scrap
 ///
-/// Can be change to scrap another page
+/// Use to scrap the main page
 static PAGE: &str = "/wiki/Kaamelott";
 
+
+/// Get the content of the page asked by parameter.
+///
+///
+fn get_page_content(page: &str) -> Option<String> {
+    let uri = get_uri(&page);
+    let html = request_content(uri.as_str());
+
+    match parse_content(html.as_str()) {
+        None => None,
+        Some(rep) => Some(rep.to_string())
+    }
+}
 
 /// Get a vector of quotes
 ///
 /// Send a request to wikiquote to get the page content. Each quote will be set into a Quote struct
-/// and be stock into a vector.
+/// and will be stocked into a vector.
 pub fn get_quotes() -> Vec<Quote> {
     let mut quotes: Vec<Quote> = vec![];
     let mut character: &str = "";
 
-    let main_page_link = get_uri(&PAGE);
-    let uri = main_page_link.as_str();
+    let content = get_page_content(&PAGE);
 
-    let html = request_content(uri);
-    let string = parse_content(html.as_str()).unwrap().to_string();
-
-    let lines = string.lines();
-    for line in lines {
+    for line in content.unwrap().lines() {
         match extract_character(line) {
             None => (),
             Some(unwrapped) => character = unwrapped
         }
 
-        let external_link = get_external_link(line);
-
-        match external_link {
+        match get_external_link(line) {
             None => (),
             Some(external_link) => {
-                let link = get_uri(&external_link);
-                let uri = link.as_str();
-                let html = request_content( uri);
-
-                match parse_content(html.as_str()) {
+                match get_page_content(&external_link) {
                     Some(sub_content) => {
-                        for line in sub_content.to_string().lines() {
-                            let current_quote = extract_quote(line);
-                            match current_quote {
+                        sub_content.to_string().lines().for_each(|line| {
+                            match extract_quote(line) {
                                 None => (),
                                 Some(quote) => {
                                     quotes.push(Quote::new(quote, character));
                                 }
                             }
-                        }
+                        });
                     }
                     None => {}
                 };
@@ -74,9 +75,9 @@ pub fn get_quotes() -> Vec<Quote> {
     quotes
 }
 
+/// This function permits to get the full URI.
 ///
-///
-///
+/// It's just a concatenation of base URL (set here by constant) and the page to be reached.
 fn get_uri(page: &&str) -> String {
     format!("{}/{}", SOURCE, page)
 }
@@ -124,9 +125,9 @@ fn get_external_link(text: &str) -> Option<&str> {
 }
 
 
+/// Send a request to URI provided.
 ///
-///
-///
+/// Returns html content as String object.
 pub fn request_content(uri: &str) -> String {
     reqwest::get(uri).unwrap().text().unwrap()
 }
@@ -138,9 +139,8 @@ pub fn request_content(uri: &str) -> String {
 pub fn parse_content(html: &str) -> Option<&str> {
     lazy_static! {
         static ref CONTENT_REGEX: Regex =
-        Regex::new(r#"<h2><span.*>(?P<content>[\w\s\W\d_]*)(class="extiw"\stitle="m:Accueil"|<!--)"# )
-        .unwrap();
-        }
+            Regex::new(r#"<h2><span.*>(?P<content>[\w\s\W\d_]*)<!--"# ).unwrap();
+    }
 
     CONTENT_REGEX.captures(html)
         .and_then(|cap| {
@@ -150,7 +150,7 @@ pub fn parse_content(html: &str) -> Option<&str> {
 
 #[cfg(test)]
 mod tests {
-    use crate::searcher::scraper::{extract_character, extract_quote, get_external_link};
+    use crate::searcher::scraper::{extract_character, extract_quote, get_external_link, parse_content, get_uri};
 
     #[test]
     fn get_back_a_quote() {
@@ -159,6 +159,22 @@ mod tests {
         let quote = extract_quote(line).unwrap_or("Aucune citation");
 
         assert_eq!("Test", quote);
+    }
+
+    #[test]
+    fn get_back_an_uri() {
+        let uri = get_uri(&"test");
+
+        assert_eq!("https://fr.wikiquote.org/test", uri);
+    }
+
+    #[test]
+    fn get_parsed_content() {
+        let line1 = r#""<h2><span>test<!--""#;
+
+        let content1 = parse_content(line1).unwrap_or("Aucun contenut");
+
+        assert_eq!("test", content1);
     }
 
     #[test]

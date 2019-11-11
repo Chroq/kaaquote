@@ -14,18 +14,6 @@ use rocket::request::LenientForm;
 #[derive(FromForm)]
 struct Command {
     text: String,
-//    token: String,
-//    team_id: String,
-//    team_domain: String,
-//    enterprise_id: String,
-//    enterprise_name: String,
-//    channel_id: String,
-//    channel_name: String,
-//    user_id: String,
-//    user_name: String,
-//    command: String,
-//    response_url: String,
-//    trigger_id: String,
 }
 
 #[post("/", data = "<input>")]
