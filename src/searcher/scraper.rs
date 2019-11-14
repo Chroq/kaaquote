@@ -3,6 +3,7 @@ extern crate regex;
 
 use crate::searcher::Quote;
 use regex::Regex;
+use htmlescape::decode_html;
 
 /// Url of the source to scrap
 ///
@@ -53,7 +54,7 @@ pub fn get_quotes() -> Vec<Quote> {
                             match extract_quote(line) {
                                 None => (),
                                 Some(quote) => {
-                                    quotes.push(Quote::new(quote, character));
+                                    quotes.push(Quote::new(quote.as_str(), character));
                                 }
                             }
                         });
@@ -67,7 +68,7 @@ pub fn get_quotes() -> Vec<Quote> {
         match current_quote {
             None => (),
             Some(quote) => {
-                quotes.push(Quote::new(quote, character));
+                quotes.push(Quote::new(quote.as_str(), character));
             }
         }
     }
@@ -99,14 +100,15 @@ fn extract_character(text: &str) -> Option<&str> {
 /// Get a quote from a line
 ///
 /// Use a regex to filter line and capture the quote if present
-fn extract_quote(text: &str) -> Option<&str> {
+fn extract_quote(text: &str) -> Option<String> {
     lazy_static! {
         static ref QUOTE_REGEX: Regex = Regex::new(r#"<div class="citation">(?P<quote>(.|\n)*)</div>"#)
         .unwrap();
     }
 
     QUOTE_REGEX.captures(text).and_then(|cap| {
-        cap.name("quote").map(|quote| quote.as_str())
+        cap.name("quote")
+            .map(|quote| decode_html(quote.as_str()).unwrap_or_default())
     })
 }
 
@@ -156,7 +158,7 @@ mod tests {
     fn get_back_a_quote() {
         let line = r#""<div class="citation">Test</div>""#;
 
-        let quote = extract_quote(line).unwrap_or("Aucune citation");
+        let quote = extract_quote(line).unwrap_or("Aucune citation".to_string());
 
         assert_eq!("Test", quote);
     }
