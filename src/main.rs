@@ -4,12 +4,15 @@
 extern crate rocket;
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate rocket_contrib;
 
 mod searcher;
 
-use crate::searcher::Quote;
+use crate::searcher::{Quote, QuoteResponse};
 use rocket::State;
 use rocket::request::LenientForm;
+use rocket_contrib::json::JsonValue;
 
 #[derive(FromForm)]
 struct Command {
@@ -17,8 +20,10 @@ struct Command {
 }
 
 #[post("/", data = "<input>")]
-fn index(input: LenientForm<Command>, quotes: State<Vec<Quote>>) -> String {
-    searcher::search(input.into_inner().text, &quotes)
+fn index(input: LenientForm<Command>, quotes: State<Vec<Quote>>) -> JsonValue {
+    let quote = searcher::search(input.into_inner().text, &quotes);
+
+    json!(QuoteResponse::new(quote))
 }
 
 fn main() {
