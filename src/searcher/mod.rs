@@ -16,7 +16,7 @@ const FILE: &str = "kaa.json";
 
 #[derive(Serialize)]
 pub struct QuoteResponse {
-    message: String,
+    text: String,
     response_type: String,
 }
 
@@ -24,7 +24,7 @@ impl QuoteResponse {
 
     pub fn new(quote: Quote) -> QuoteResponse {
         QuoteResponse {
-            message: quote.format(),
+            text: quote.format(),
             response_type: "in_channel".to_string()
         }
     }
@@ -50,7 +50,7 @@ impl Quote {
 
     /// Format a quote struct
     fn format(&self) -> String {
-        format!("`{}` - _{}_", self.text, self.character)
+        format!("`{}` _{}_", self.text, self.character)
     }
 
     /// Search into text the pattern
