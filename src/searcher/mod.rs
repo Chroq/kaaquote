@@ -50,7 +50,7 @@ impl Quote {
 
     /// Format a quote struct
     fn format(&self) -> String {
-        format!("{} - <i>{}</i>", self.text, self.character)
+        format!("`{}` - _{}_", self.text, self.character)
     }
 
     /// Search into text the pattern
