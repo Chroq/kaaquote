@@ -14,6 +14,24 @@ use rand::Rng;
 const DATA_DIRECTORY: &str = "data";
 const FILE: &str = "kaa.json";
 
+#[derive(Serialize)]
+pub struct QuoteResponse {
+    message: String,
+    response_type: String,
+}
+
+impl QuoteResponse {
+
+    pub fn new(quote: Quote) -> QuoteResponse {
+        QuoteResponse {
+            message: quote.format(),
+            response_type: "in_channel".to_string()
+        }
+    }
+
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Quote {
     text: String,
@@ -62,17 +80,17 @@ pub fn init() -> Vec<Quote> {
 ///
 ///
 ///
-pub fn search(word: String, slice: &[Quote]) -> String {
+pub fn search(word: String, slice: &[Quote]) -> Quote {
     let mut founds = slice.to_vec();
     founds.retain(|x| x.search_for_word(&word));
 
     let entry_count = founds.len();
 
     match entry_count {
-        0 => String::from("Aucune citation trouvée"),
+        0 => Quote::new("Aucune citation trouvée", ""),
         _ => {
             let position = rand::thread_rng().gen_range(0, entry_count);
-            founds.get(position).unwrap().format()
+            founds.get(position).unwrap().clone()
         }
     }
 }
